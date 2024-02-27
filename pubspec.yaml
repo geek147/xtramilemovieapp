@@ -1,0 +1,50 @@
+name: movieapp
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  equatable: ^2.0.5
+  cupertino_icons: ^1.0.1
+  flutter_bloc: ^8.1.4
+  shared_preferences: ^2.2.2
+  permission_handler: ^11.3.0
+  connectivity: ^3.0.6
+  carousel_slider: ^4.2.1
+  cached_network_image: ^3.3.1
+  provider: ^6.1.1
+  slider_view: ^1.1.0
+  dio: ^5.4.1
+  get_it: ^7.2.0
+  infinite_scroll_pagination: ^4.0.0
+  dio_cache_interceptor: ^3.4.2
+  dio_cache_interceptor_hive_store: ^3.2.1
+  path_provider: ^2.1.2
+  shape_of_view_null_safe: ^3.0.0
+  youtube_player_flutter: ^9.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  generate: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Muli
+      fonts:
+        - asset: assets/fonts/Muli-Bold.ttf
+        - asset: assets/fonts/Muli-SemiBold.ttf
+        - asset: assets/fonts/Muli-Regular.ttf
