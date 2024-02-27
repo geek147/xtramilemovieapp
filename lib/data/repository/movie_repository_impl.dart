@@ -7,7 +7,6 @@ import 'package:movieapp/data/remote/response/movie_review_response.dart';
 import 'package:movieapp/data/remote/response/movie_video_response.dart';
 import 'package:movieapp/models/genre.dart';
 import 'package:movieapp/models/movie.dart';
-import 'package:movieapp/models/movie_image.dart';
 import 'package:movieapp/models/movie_info.dart';
 import 'package:movieapp/models/movie_review.dart';
 import 'package:movieapp/models/video.dart';
@@ -44,27 +43,6 @@ class MovieRepositoryImpl extends MovieRepository {
       return MovieInfo.parserFromJson(response.data);
     } else {
       throw Exception('Fail to load movie info');
-    }
-  }
-
-  @override
-  Future<MovieImage> getMovieImages(int movieId) async {
-    final Request request = serviceLocator<Request>();
-    final Map<String, dynamic> query = {
-      'api_key': apiKey,
-      'language': movieLanguage,
-      'page': 1
-    };
-
-    final response = await request.get(
-      '/3/movie/$movieId/images',
-      query,
-    );
-
-    if (response.statusCode == 200) {
-      return MovieImage.parserFromJson(response.data);
-    } else {
-      throw Exception('Fail to load movie images');
     }
   }
 

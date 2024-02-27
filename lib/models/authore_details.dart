@@ -4,7 +4,7 @@ class AuthorDetails extends Equatable {
   final String? name;
   final String? username;
   final String? avatarPath;
-  final int? rating;
+  final double? rating;
 
   const AuthorDetails({
     this.name,

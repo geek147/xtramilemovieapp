@@ -70,7 +70,7 @@ class ListHorizontalViewState extends State<ListHorizontalView> {
                             const Expanded(
                               flex: 1,
                               child: Text(
-                                "List Movie",
+                                "Movie",
                                 style: TextStyle(
                                   color: groupTitleColor,
                                   fontSize: 16.0,

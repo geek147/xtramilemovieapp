@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movieapp/models/movie.dart';
 import 'package:movieapp/ui/detail/detail_screen.dart';
 import 'package:movieapp/ui/list_movie/widget/list_horizontal_view.dart';
+import 'package:movieapp/ui/list_movie/widget/list_vertical_view.dart';
 import 'package:movieapp/ui/list_movie/widget/slider_view.dart';
 import 'package:movieapp/ui/theme/colors.dart';
 
@@ -74,16 +75,14 @@ class ListMovieState extends State<ListMovieScreen>
                   actionLoadAll: () {},
                   genreId: widget.genreId,
                 ),
-                const Divider(height: 8.0, color: Colors.transparent),
-                // Expanded(
-                //   child: ListVerticalView(
-                //     actionOpenMovie: (movie) {
-                //       _openMovieDetail(movie);
-                //     },
-                //     actionLoadAll: () {},
-                //     genreId: widget.genreId,
-                //   ),
-                // ),
+                const Divider(height: 4.0, color: Colors.transparent),
+                ListVerticalView(
+                  actionOpenMovie: (movie) {
+                    _openMovieDetail(movie);
+                  },
+                  actionLoadAll: () {},
+                  genreId: widget.genreId,
+                ),
               ],
             ),
           ),

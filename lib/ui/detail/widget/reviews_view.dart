@@ -50,82 +50,96 @@ class ListHorizontalViewState extends State<ReviewView> {
         );
       }
     }, builder: (context, state) {
+      final contentHeight = 4.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
       return Container(
         child: state is LoadingReview
             ? const Center(
                 child: CircularProgressIndicator(),
               )
             : state is GetReviewsSuccess
-                ? Column(
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 20.0, right: 16.0),
-                        height: 48.0,
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Text(
-                                "List Movie",
-                                style: TextStyle(
-                                  color: groupTitleColor,
-                                  fontSize: 16.0,
-                                  fontFamily: 'Muli',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.arrow_forward,
-                                  color: groupTitleColor),
-                              onPressed: () {
-                                widget.actionLoadAll;
-                              },
-                            )
-                          ],
-                        ),
-                      ),
-                      ListView.separated(
-                        controller: controller,
-                        separatorBuilder: (_, __) => const Divider(),
-                        itemCount: state.listReview.length,
-                        itemBuilder: (context, index) {
-                          if (index < state.listReview.length) {
-                            final item = state.listReview[index];
-                            return ListTile(
-                              leading: CachedNetworkImage(
-                                width: 80,
-                                height: 60,
-                                imageUrl: item.authorDetails?.avatarPath ?? '',
-                                progressIndicatorBuilder:
-                                    (context, url, downloadProgress) => Center(
-                                        child: CircularProgressIndicator(
-                                            value: downloadProgress.progress)),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.account_circle_rounded),
-                              ),
-                              title: Container(
-                                margin: const EdgeInsets.only(bottom: 5),
+                ? SizedBox(
+                    height: contentHeight,
+                    child: Column(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          padding:
+                              const EdgeInsets.only(left: 20.0, right: 16.0),
+                          height: 48.0,
+                          child: Row(
+                            children: [
+                              const Expanded(
+                                flex: 1,
                                 child: Text(
-                                  item.author ?? "N/A",
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
+                                  "User Review",
+                                  style: TextStyle(
+                                    color: groupTitleColor,
+                                    fontSize: 16.0,
+                                    fontFamily: 'Muli',
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              subtitle: Text(item.content ?? "N/A"),
-                            );
-                          }
-                          return const Center(
-                            child: SizedBox(
-                                width: 32.0,
-                                height: 32.0,
-                                child: CircularProgressIndicator()),
-                          );
-                        },
-                      ),
-                    ],
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward,
+                                    color: groupTitleColor),
+                                onPressed: () {
+                                  widget.actionLoadAll;
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: SizedBox(
+                            height: contentHeight,
+                            child: ListView.separated(
+                              controller: controller,
+                              separatorBuilder: (_, __) => const Divider(),
+                              itemCount: state.listReview.length,
+                              itemBuilder: (context, index) {
+                                if (index < state.listReview.length) {
+                                  final item = state.listReview[index];
+                                  return ListTile(
+                                    leading: CachedNetworkImage(
+                                      width: 80,
+                                      height: 60,
+                                      imageUrl:
+                                          item.authorDetails?.avatarPath ?? '',
+                                      progressIndicatorBuilder: (context, url,
+                                              downloadProgress) =>
+                                          Center(
+                                              child: CircularProgressIndicator(
+                                                  value: downloadProgress
+                                                      .progress)),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(
+                                              Icons.account_circle_rounded),
+                                    ),
+                                    title: Container(
+                                      margin: const EdgeInsets.only(bottom: 5),
+                                      child: Text(
+                                        item.author ?? "N/A",
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    subtitle: Text(item.content ?? "N/A"),
+                                  );
+                                }
+                                return const Center(
+                                  child: SizedBox(
+                                      width: 32.0,
+                                      height: 32.0,
+                                      child: CircularProgressIndicator()),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 : ErrorPage(
                     message: err,

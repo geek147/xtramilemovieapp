@@ -52,57 +52,66 @@ class ListVerticalViewState extends State<ListVerticalView> {
         );
       }
     }, builder: (context, state) {
+      final contentHeight = 4.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
       return Container(
         child: state is Loading && listMovie.isEmpty
             ? const Center(
                 child: CircularProgressIndicator(),
               )
             : state is GetMoviesSuccess && listMovie.isNotEmpty
-                ? Column(
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.only(left: 20.0, right: 16.0),
-                        height: 48.0,
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Text(
-                                "List Movie",
-                                style: TextStyle(
-                                  color: groupTitleColor,
-                                  fontSize: 16.0,
-                                  fontFamily: 'Muli',
-                                  fontWeight: FontWeight.bold,
+                ? SizedBox(
+                    height: contentHeight,
+                    child: Column(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          padding:
+                              const EdgeInsets.only(left: 20.0, right: 16.0),
+                          height: 48.0,
+                          child: Row(
+                            children: [
+                              const Expanded(
+                                flex: 1,
+                                child: Text(
+                                  "Movies",
+                                  style: TextStyle(
+                                    color: groupTitleColor,
+                                    fontSize: 16.0,
+                                    fontFamily: 'Muli',
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward,
+                                    color: groupTitleColor),
+                                onPressed: () {
+                                  widget.actionLoadAll;
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.arrow_forward,
-                                  color: groupTitleColor),
-                              onPressed: () {
-                                widget.actionLoadAll;
-                              },
-                            )
-                          ],
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            itemCount: listMovie.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return _createMyListItem(
+                                  context, listMovie[index]);
+                            },
+                            scrollDirection: Axis.vertical,
+                          ),
                         ),
-                      ),
-                      GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16.0,
-                          mainAxisSpacing: 16.0,
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        itemCount: listMovie.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return _createMyListItem(context, listMovie[index]);
-                        },
-                        scrollDirection: Axis.vertical,
-                      ),
-                    ],
+                      ],
+                    ),
                   )
                 : ErrorPage(
                     message: err,
@@ -151,41 +160,4 @@ class ListVerticalViewState extends State<ListVerticalView> {
       ),
     );
   }
-
-  // Widget _createMyListItem(BuildContext context, Movie movie) {
-  //   final width = MediaQuery.of(context).size.width / 2.6;
-  //   return InkWell(
-  //     onTap: () {
-  //       widget.actionOpenMovie(movie);
-  //     },
-  //     child: Container(
-  //       width: width,
-  //       height: double.infinity,
-  //       padding: const EdgeInsets.only(bottom: 20.0),
-  //       child: Card(
-  //         elevation: 10.0,
-  //         borderOnForeground: true,
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(12.0),
-  //         ),
-  //         child: SizedBox(
-  //           width: width,
-  //           height: double.infinity,
-  //           child: ClipRRect(
-  //             borderRadius: BorderRadius.circular(8.0),
-  //             child: CachedNetworkImage(
-  //               placeholder: (context, url) => const Center(
-  //                 child: CircularProgressIndicator(),
-  //               ),
-  //               imageUrl: 'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-  //               width: width,
-  //               height: double.infinity,
-  //               fit: BoxFit.cover,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }
