@@ -33,14 +33,18 @@ class ListHorizontalViewState extends State<ListHorizontalView> {
   void initState() {
     super.initState();
 
-    context.read<MovieBloc>().add(GetMoviesByGenreEvent(genre: widget.genreId));
+    context
+        .read<MovieBloc>()
+        .add(GetMoviesByGenreEvent(genre: widget.genreId, page: 0));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieBloc, MovieState>(listener: (context, state) {
       if (state is GetMoviesSuccess) {
-        listMovie = state.listMovie;
+        setState(() {
+          listMovie.addAll(state.listMovie);
+        });
       } else if (state is GetMoviesError) {
         err = state.message;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +62,7 @@ class ListHorizontalViewState extends State<ListHorizontalView> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : state is GetMoviesSuccess && listMovie.isNotEmpty
+            : listMovie.isNotEmpty
                 ? Column(
                     children: [
                       Container(
@@ -70,7 +74,7 @@ class ListHorizontalViewState extends State<ListHorizontalView> {
                             const Expanded(
                               flex: 1,
                               child: Text(
-                                "Movie",
+                                "Movies",
                                 style: TextStyle(
                                   color: groupTitleColor,
                                   fontSize: 16.0,
@@ -111,9 +115,8 @@ class ListHorizontalViewState extends State<ListHorizontalView> {
                 : ErrorPage(
                     message: err,
                     retry: () {
-                      context
-                          .read<MovieBloc>()
-                          .add(GetMoviesByGenreEvent(genre: widget.genreId));
+                      context.read<MovieBloc>().add(GetMoviesByGenreEvent(
+                          genre: widget.genreId, page: 0));
                     },
                   ),
       );

@@ -14,12 +14,12 @@ import 'package:movieapp/util/strings.dart';
 
 class MovieRepositoryImpl extends MovieRepository {
   @override
-  Future<List<Movie>> getMoviesByGenre(String genre) async {
+  Future<List<Movie>> getMoviesByGenre(String genre, int page) async {
     final Request request = serviceLocator<Request>();
     final Map<String, dynamic> query = {
       'api_key': apiKey,
       'language': movieLanguage,
-      'page': 1,
+      'page': page + 1,
       'with_genres': genre,
     };
     final response = await request.get("/3/discover/movie", query);
@@ -67,12 +67,12 @@ class MovieRepositoryImpl extends MovieRepository {
   }
 
   @override
-  Future<List<Review>> getReviews(int movieId) async {
+  Future<List<Review>> getReviews(int movieId, int page) async {
     final Request request = serviceLocator<Request>();
     final Map<String, dynamic> query = {
       'api_key': apiKey,
       'language': movieLanguage,
-      'page': 1
+      'page': page + 1
     };
     final response = await request.get('/3/movie/$movieId/reviews', query);
     if (response.statusCode == 200) {

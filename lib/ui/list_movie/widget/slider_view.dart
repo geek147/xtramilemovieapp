@@ -32,14 +32,18 @@ class SliderViewState extends State<SliderView> {
   void initState() {
     super.initState();
 
-    context.read<MovieBloc>().add(GetMoviesByGenreEvent(genre: widget.genreId));
+    context
+        .read<MovieBloc>()
+        .add(GetMoviesByGenreEvent(genre: widget.genreId, page: 0));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieBloc, MovieState>(listener: (context, state) {
       if (state is GetMoviesSuccess) {
-        listMovie = state.listMovie;
+        setState(() {
+          listMovie.addAll(state.listMovie);
+        });
       } else if (state is GetMoviesError) {
         err = state.message;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -56,7 +60,7 @@ class SliderViewState extends State<SliderView> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : state is GetMoviesSuccess && listMovie.isNotEmpty
+            : listMovie.isNotEmpty
                 ? Container(
                     padding: const EdgeInsets.all(16),
                     child: CarouselSlider.builder(
@@ -79,9 +83,8 @@ class SliderViewState extends State<SliderView> {
                 : ErrorPage(
                     message: err,
                     retry: () {
-                      context
-                          .read<MovieBloc>()
-                          .add(GetMoviesByGenreEvent(genre: widget.genreId));
+                      context.read<MovieBloc>().add(GetMoviesByGenreEvent(
+                          genre: widget.genreId, page: 0));
                     },
                   ),
       );

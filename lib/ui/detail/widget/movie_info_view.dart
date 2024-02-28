@@ -34,6 +34,7 @@ class MovieInfoViewState extends State<MovieInfoView> {
   Widget build(BuildContext context) {
     return BlocConsumer<MovieBloc, MovieState>(listener: (context, state) {
       if (state is GetInfoError) {
+        err = state.message;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

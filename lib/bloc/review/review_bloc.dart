@@ -8,10 +8,12 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   ReviewBloc() : super(InitialReview()) {
     on<GetMovieReviewsEvent>((event, emit) async {
       try {
-        emit(LoadingReview());
+        if (event.page == 1) {
+          emit(LoadingReview());
+        }
 
-        final result =
-            await serviceLocator<MovieRepository>().getReviews(event.movieId);
+        final result = await serviceLocator<MovieRepository>()
+            .getReviews(event.movieId, event.page);
         emit(GetReviewsSuccess(listReview: result));
       } catch (e) {
         emit(GetReviewsError(message: e.toString()));

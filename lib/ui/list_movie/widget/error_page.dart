@@ -21,7 +21,7 @@ class ErrorPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           TextButton(
-            onPressed: () => retry,
+            onPressed: () => retry?.call(),
             child: const Text(
               'Retry',
             ),

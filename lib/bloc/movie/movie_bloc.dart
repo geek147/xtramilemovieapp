@@ -19,10 +19,12 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
 
     on<GetMoviesByGenreEvent>((event, emit) async {
       try {
-        emit(Loading());
+        if (event.page == 1) {
+          emit(Loading());
+        }
 
         final result = await serviceLocator<MovieRepository>()
-            .getMoviesByGenre(event.genre);
+            .getMoviesByGenre(event.genre, event.page);
         emit(GetMoviesSuccess(listMovie: result));
       } catch (e) {
         emit(GetMoviesError(message: e.toString()));

@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movieapp/bloc/review/review_bloc.dart';
 import 'package:movieapp/bloc/review/review_event.dart';
 import 'package:movieapp/bloc/review/review_state.dart';
+import 'package:movieapp/models/movie_review.dart';
 import 'package:movieapp/ui/list_movie/widget/error_page.dart';
+import 'package:movieapp/ui/list_movie/widget/star_rating.dart';
 import 'package:movieapp/ui/theme/colors.dart';
 import 'package:movieapp/util/strings.dart';
 
@@ -25,6 +27,8 @@ class ReviewView extends StatefulWidget {
 class ListHorizontalViewState extends State<ReviewView> {
   String err = defaultErr;
   ScrollController? controller;
+  int currentPage = 0;
+  List<Review> listReview = [];
 
   @override
   void initState() {
@@ -33,7 +37,7 @@ class ListHorizontalViewState extends State<ReviewView> {
 
     context
         .read<ReviewBloc>()
-        .add(GetMovieReviewsEvent(movieId: widget.movieId));
+        .add(GetMovieReviewsEvent(movieId: widget.movieId, page: currentPage));
   }
 
   @override
@@ -48,6 +52,15 @@ class ListHorizontalViewState extends State<ReviewView> {
             ),
           ),
         );
+      } else if (state is GetReviewsSuccess) {
+        setState(() {
+          currentPage = currentPage + 1;
+          if (currentPage == 1) {
+            listReview = state.listReview;
+          } else {
+            listReview.addAll(state.listReview);
+          }
+        });
       }
     }, builder: (context, state) {
       final contentHeight = 4.0 * (MediaQuery.of(context).size.width / 2.4) / 3;
@@ -56,7 +69,7 @@ class ListHorizontalViewState extends State<ReviewView> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : state is GetReviewsSuccess
+            : listReview.isNotEmpty
                 ? SizedBox(
                     height: contentHeight,
                     child: Column(
@@ -96,10 +109,10 @@ class ListHorizontalViewState extends State<ReviewView> {
                             child: ListView.separated(
                               controller: controller,
                               separatorBuilder: (_, __) => const Divider(),
-                              itemCount: state.listReview.length,
+                              itemCount: listReview.length,
                               itemBuilder: (context, index) {
-                                if (index < state.listReview.length) {
-                                  final item = state.listReview[index];
+                                if (index < listReview.length) {
+                                  final item = listReview[index];
                                   return ListTile(
                                     leading: CachedNetworkImage(
                                       width: 80,
@@ -125,7 +138,38 @@ class ListHorizontalViewState extends State<ReviewView> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    subtitle: Text(item.content ?? "N/A"),
+                                    subtitle: Column(
+                                      children: [
+                                        Text(item.content ?? "N/A"),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text("Rating"),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Container(
+                                              alignment: Alignment.center,
+                                              child: StarRating(
+                                                size: 24.0,
+                                                rating: item.authorDetails
+                                                            ?.rating ==
+                                                        null
+                                                    ? 0
+                                                    : item.authorDetails!
+                                                            .rating! /
+                                                        2,
+                                                color: Colors.red,
+                                                borderColor: Colors.black54,
+                                                starCount: 5,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 }
                                 return const Center(
@@ -144,9 +188,11 @@ class ListHorizontalViewState extends State<ReviewView> {
                 : ErrorPage(
                     message: err,
                     retry: () {
-                      context
-                          .read<ReviewBloc>()
-                          .add(GetMovieReviewsEvent(movieId: widget.movieId));
+                      setState(() {
+                        currentPage = 0;
+                      });
+                      context.read<ReviewBloc>().add(GetMovieReviewsEvent(
+                          movieId: widget.movieId, page: currentPage));
                     },
                   ),
       );
@@ -161,9 +207,8 @@ class ListHorizontalViewState extends State<ReviewView> {
 
   void _scrollListener() {
     if (controller?.position.pixels == controller?.position.maxScrollExtent) {
-      context
-          .read<ReviewBloc>()
-          .add(GetMovieReviewsEvent(movieId: widget.movieId));
+      context.read<ReviewBloc>().add(
+          GetMovieReviewsEvent(movieId: widget.movieId, page: currentPage));
     }
   }
 }

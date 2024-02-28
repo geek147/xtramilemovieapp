@@ -10,6 +10,7 @@ class GetMovieInfoEvent extends MovieEvent {
 
 class GetMoviesByGenreEvent extends MovieEvent {
   final String genre;
+  final int page;
 
-  GetMoviesByGenreEvent({required this.genre});
+  GetMoviesByGenreEvent({required this.genre, required this.page});
 }

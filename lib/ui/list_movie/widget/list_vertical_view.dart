@@ -28,19 +28,31 @@ class ListVerticalView extends StatefulWidget {
 class ListVerticalViewState extends State<ListVerticalView> {
   List<Movie> listMovie = [];
   String err = defaultErr;
+  ScrollController? controller;
+  int currentPage = 0;
 
   @override
   void initState() {
     super.initState();
+    controller = ScrollController()..addListener(_scrollListener);
 
-    context.read<MovieBloc>().add(GetMoviesByGenreEvent(genre: '12'));
+    context
+        .read<MovieBloc>()
+        .add(GetMoviesByGenreEvent(genre: widget.genreId, page: currentPage));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MovieBloc, MovieState>(listener: (context, state) {
       if (state is GetMoviesSuccess) {
-        listMovie = state.listMovie;
+        setState(() {
+          currentPage = currentPage + 1;
+          if (currentPage == 1) {
+            listMovie = state.listMovie;
+          } else {
+            listMovie.addAll(state.listMovie);
+          }
+        });
       } else if (state is GetMoviesError) {
         err = state.message;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +70,7 @@ class ListVerticalViewState extends State<ListVerticalView> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : state is GetMoviesSuccess && listMovie.isNotEmpty
+            : listMovie.isNotEmpty
                 ? SizedBox(
                     height: contentHeight,
                     child: Column(
@@ -94,6 +106,7 @@ class ListVerticalViewState extends State<ListVerticalView> {
                         ),
                         Expanded(
                           child: GridView.builder(
+                            controller: controller,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
@@ -116,9 +129,11 @@ class ListVerticalViewState extends State<ListVerticalView> {
                 : ErrorPage(
                     message: err,
                     retry: () {
-                      context
-                          .read<MovieBloc>()
-                          .add(GetMoviesByGenreEvent(genre: widget.genreId));
+                      setState(() {
+                        currentPage = 0;
+                      });
+                      context.read<MovieBloc>().add(GetMoviesByGenreEvent(
+                          genre: widget.genreId, page: currentPage));
                     },
                   ),
       );
@@ -159,5 +174,19 @@ class ListVerticalViewState extends State<ListVerticalView> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller?.removeListener(_scrollListener);
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (controller?.position.pixels == controller?.position.maxScrollExtent) {
+      context
+          .read<MovieBloc>()
+          .add(GetMoviesByGenreEvent(genre: widget.genreId, page: currentPage));
+    }
   }
 }

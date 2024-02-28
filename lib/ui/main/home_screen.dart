@@ -5,7 +5,9 @@ import 'package:movieapp/bloc/movie/movie_event.dart';
 import 'package:movieapp/bloc/movie/movie_state.dart';
 import 'package:movieapp/models/genre.dart';
 import 'package:movieapp/ui/list_movie/list_movie_screen.dart';
+import 'package:movieapp/ui/list_movie/widget/error_page.dart';
 import 'package:movieapp/ui/theme/colors.dart';
+import 'package:movieapp/util/strings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class HomeState extends State<HomeScreen> {
   List<Genre> listGenre = [];
+  String err = defaultErr;
 
   @override
   void initState() {
@@ -32,6 +35,7 @@ class HomeState extends State<HomeScreen> {
       if (state is GetGenresSuccess) {
         listGenre = state.listGenre;
       } else if (state is GetGenresError) {
+        err = state.message;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -71,34 +75,45 @@ class HomeState extends State<HomeScreen> {
         ),
         backgroundColor: backgroundColor,
         body: SafeArea(
-            child: state is Loading && listGenre.isEmpty
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(16),
-                    child: ListView.separated(
-                        separatorBuilder: (_, __) => const Divider(),
-                        itemCount: listGenre.length,
-                        itemBuilder: (context, index) {
-                          final currentGenre = listGenre[index];
-                          return ListTile(
-                            onTap: () {
-                              if (currentGenre.id != null) {
-                                openMovieList(currentGenre.id.toString());
-                              }
-                            },
-                            title: Container(
-                              margin: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                currentGenre.name ?? "N/A",
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+          child: state is Loading && listGenre.isEmpty
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : listGenre.isNotEmpty
+                  ? Container(
+                      padding: const EdgeInsets.all(16),
+                      child: ListView.separated(
+                          separatorBuilder: (_, __) => const Divider(),
+                          itemCount: listGenre.length,
+                          itemBuilder: (context, index) {
+                            final currentGenre = listGenre[index];
+                            return ListTile(
+                              onTap: () {
+                                if (currentGenre.id != null) {
+                                  openMovieList(currentGenre.id.toString());
+                                }
+                              },
+                              title: Container(
+                                margin: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  currentGenre.name ?? "N/A",
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                          );
-                        }),
-                  )),
+                            );
+                          }),
+                    )
+                  : ErrorPage(
+                      message: err,
+                      retry: () {
+                        context.read<MovieBloc>().add(
+                              GetGenresEvent(),
+                            );
+                      },
+                    ),
+        ),
       );
     });
   }
